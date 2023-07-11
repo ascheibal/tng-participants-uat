@@ -176,7 +176,7 @@ do
 			CERTPATHCOMP=$($DIRNAME "${CERTPATH}")
 		    SIGNEDCERT=signed.$CERT.pem
 		    CSR=$CERT.CSR
-		    SIGNEDTXT=TNG_$USAGE.signed.${CERT%.pem}.txt
+		    SIGNEDTXT=TNG_$USAGE.signed.${CERT%.pem}.json
 		    SIGNEDCERTPATH=$SIGNEDDIR/$SIGNEDCERT
 		    SIGNEDTXTPATH=$SIGNEDDIR/$SIGNEDTXT
 		    CSRPATH=$SIGNEDDIR/$CSR
@@ -209,12 +209,19 @@ do
 		echo -n '"certificateCountry": "'$COUNTRYNAME \
 			     >>  $SIGNEDTXTPATH
 		echo '"' >>  $SIGNEDTXTPATH
-		echo -n '}' >>  $SIGNEDTXTPATH		   
+		echo -n '}' >>  $SIGNEDTXTPATH
+		echo move $SIGNEDCERTPATH to $CERTPATHCOMP/${CERTNAME}pem
+		mv $SIGNEDCERTPATH $CERTPATHCOMP/${CERTNAME}pem # move signed pem
+		# cleanup
+		 for delTMP in ${CERTPATHCOMP}/signed/*.der ${CERTPATHCOMP}/signed/*.csr ${CERTPATHCOMP}/*.csr ; do
+		 rm -rf $delTMP
+		 done
+
 		#     else 
 		# 	echo "           Skipping Text Output"
 		#     fi
 		done
-	    done
+	 done
 	done
   done
 done

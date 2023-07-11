@@ -186,8 +186,6 @@ do
 		    openssl ca -batch -create_serial -notext -config $SIGNINGCFG -cert $SIGNINGCA -keyfile $SIGNINGKEY \
 			-in $CERTPATH -out $SIGNEDCERTPATH -preserveDN  2>&1 | sed 's/^/            | /g'
 		    cd $CURRDIR
-			echo copy $SIGNEDCERTPATH to $CERTPATHCOMP/${CERTNAME}pem
-			cp $SIGNEDCERTPATH $CERTPATHCOMP/${CERTNAME}pem
 		#     COUNTRYNAME=`openssl x509 -in ${CERTPATH} -noout -subject -nameopt multiline | grep countryName | awk -F'=' '{print $2}'  | sed 's/\s*//'`
 		#     if [ ! -z ${COUNTRYNAME} ]; then
 		# 	echo "           Text Output At ${COUNTRYNAME}: $SIGNEDTXTPATH"
@@ -202,12 +200,18 @@ do
 		echo Certificate Thumbprint: >>  $SIGNEDTXTPATH
 		echo `openssl x509 -in ${SIGNEDCERTPATH} -fingerprint -sha256 -noout | awk -F'=' '{print $2}' | sed 's/://g' | sed 's/[A-Z]/\L&/g' ` >>  $SIGNEDTXTPATH
 		echo >>  $SIGNEDTXTPATH
-		echo Certificate Country: $COUNTRYNAME >>  $SIGNEDTXTPATH  
+		echo Certificate Country: $COUNTRYNAME >>  $SIGNEDTXTPATH
+		echo move $SIGNEDCERTPATH to $CERTPATHCOMP/${CERTNAME}pem
+		mv $SIGNEDCERTPATH $CERTPATHCOMP/${CERTNAME}pem # move signed pem
+		# cleanup
+		 for delTMP in ${CERTPATHCOMP}/signed/*.der ${CERTPATHCOMP}/signed/*.csr ${CERTPATHCOMP}/*.csr ; do
+		 rm -rf $delTMP
+		 done
 		#     else 
 		# 	echo "           Skipping Text Output"
 		#     fi
-		done
-	    done
+	  done
+	 done
 	done
   done
 done
